@@ -2,6 +2,7 @@ from pusht_single_env import PushTEnv
 import concurrent.futures
 import random
 import cv2
+import numpy as np
 
 class MultiPushTEnv():
     """A, asynchronous parallelised version of the pushT environment.
@@ -18,7 +19,7 @@ class MultiPushTEnv():
         self.max_workers = max_workers
         
         # Init envs (seed 0-200 are used for the demonstration dataset)
-        seeds = random.sample(range(0, 200), self.n_envs)
+        seeds = random.sample(range(201, 10000), self.n_envs)
         self.envs = []
         for i in range(n_envs):
             env = PushTEnv()
@@ -26,19 +27,19 @@ class MultiPushTEnv():
             self.envs.append(env)
         
     def step_single_env(self, env, action):
-        """Step one environment with the action. Convenience method for multiprocessing pooling
+        """Step one environment with the action. Convenience method for threading pooling
         """
         obs, reward, done, info = env.step(action)
         return obs, reward, done, info
 
 
     def reset_single_env(self, env):
-        """Reset one environment. Convenience method for multiprocessing pooling
+        """Reset one environment. Convenience method for threading pooling
         """
         return env.reset()
 
     def render_single_env(self, env):
-        """Rended a single environment. Convenience method for multiprocessing pooling 
+        """Rended a single environment. Convenience method for threading pooling 
         """
         return env.render(mode='rgb_array')
     
@@ -67,7 +68,7 @@ class MultiPushTEnv():
 
 
     def reset(self):
-        """Reset all environments together. Done only at the start of the cycle
+        """Reset all environments together in parallel. Done only at the start of the cycle
         """
         with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             return list(executor.map(self.reset_single_env, self.envs))
@@ -75,7 +76,7 @@ class MultiPushTEnv():
 
     def render(self):
         """
-        Render all environments together
+        Render all environments together in parallel
         """
         with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             return list(executor.map(self.render_single_env, self.envs))
@@ -86,24 +87,24 @@ class MultiPushTEnv():
 ### TESTING ###
 
 multienv = MultiPushTEnv(n_envs=5)
-
 obs = multienv.reset()
-print(obs)
+
+print(f"Observations on resetting \n {obs}")
 
 
-imgs = multienv.render()
-
+# Sampling random actions
 actions = []
 for i in range(multienv.n_envs):
     actions.append(multienv.envs[0].action_space.sample())
 
 
-
+# Stepping in parallel
 step_outcomes, reset_obs = multienv.step(actions)
 
-print(step_outcomes[0])
+print(f"Step outcomes of each env (excluding info) \n {step_outcomes[0][:-1]}")
 
-
+# Rendering
+imgs = multienv.render()
 cv2.imshow("frame", imgs[2])
 # waits for user to press any key 
 # (this is necessary to avoid Python kernel form crashing) 
