@@ -3,7 +3,7 @@ import isaacgymenvs
 import torch
 
 
-num_envs = 3
+num_envs = 25
 
 
 envs = isaacgymenvs.make(
@@ -24,7 +24,7 @@ envs.is_vector_env = True
 print("Observation space is", envs.observation_space)
 print("Action space is", envs.action_space)
 obs = envs.reset()
-for i in range(10):
+for i in range(1000):
 	random_actions = 2.0 * torch.rand((num_envs,) + envs.action_space.shape, device = 'cuda:0') - 1.0
 	# random_actions = random_actions * 0.0
 	envs.step(random_actions)

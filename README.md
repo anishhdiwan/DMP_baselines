@@ -1,6 +1,9 @@
-This repository contains baseline implementations of several methods to better understand amd compare with a proposed diffusion cost functions method. 
+This repository contains baseline implementations of several methods to better understand amd compare with a proposed method for imitation learning via diffusion
 
-It assumes that [IsaacGym Preview_v4](https://developer.nvidia.com/isaac-gym) and [IsaacGymEnvs](https://github.com/NVIDIA-Omniverse/IsaacGymEnvs) are both installed (preferably using the conda env). NOTE: custom envs can also be created using the isaacgym api, however, at present baselines are tested on Cartpole as defined in IsaacGymEnvs.
+
+# Adversarial Motion Priors
+
+
 
 # Cross Entropy Method (for optimization)
 
